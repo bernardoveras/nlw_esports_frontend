@@ -7,7 +7,7 @@ import { CreateAdBanner } from './components/CreateAdBanner';
 import logo from './assets/logo-nlw-esports.svg';
 import { useEffect, useState } from 'react';
 import { GameController } from 'phosphor-react';
-import { Input } from './components/Form/input';
+import { Input } from './components/Form/Input';
 
 interface Game {
   id: string;
