@@ -5,6 +5,7 @@ import * as Checkbox from '@radix-ui/react-checkbox';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import { FormEvent, useEffect, useState } from "react";
 import axios from "axios";
+import { BounceLoader } from "react-spinners";
 
 interface Game {
   id: string;
@@ -15,6 +16,7 @@ export function CreateAdModal() {
   const [games, setGames] = useState<Game[]>([]);
   const [weekDays, setWeekDays] = useState<string[]>([]);
   const [useVoiceChannel, setUseVoiceChannel] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     axios('http://localhost:3333/games')
@@ -32,6 +34,8 @@ export function CreateAdModal() {
     if (!data.name) return;
 
     try {
+      setLoading(true);
+
       await axios.post(`http://localhost:3333/games/${data.game}/ads`, {
         "name": data.name,
         "yearsPlaying": Number(data.yearsPlaying),
@@ -42,15 +46,15 @@ export function CreateAdModal() {
         "useVoiceChannel": useVoiceChannel,
       });
 
-      alert('Anúncio criado com sucesso!');
     } catch (error) {
       console.log(error);
-      alert('Erro ao criar o anúncio.');
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <Dialog.Portal>
+    <Dialog.Portal >
       <Dialog.Overlay className='bg-black/60 inset-0 fixed' />
       <Dialog.Content className="fixed bg-[#2A2634] py-8 px-10 text-white top-1/2 left-1/2  -translate-x-1/2 -translate-y-1/2 rounded-lg w-[480px] shadow-lg shadow-black/25">
         <Dialog.Title className="text-3xl font-black">Publique um anúncio</Dialog.Title>
@@ -179,16 +183,25 @@ export function CreateAdModal() {
           <footer className="mt-4 flex justify-end gap-4">
             <Dialog.Close
               type="button"
+
               className="bg-zinc-500 rounded-md px-5 h-12 font-semibold hover:bg-zinc-600 transition-all">
               Cancelar
             </Dialog.Close>
-
+            
             <button
               type="submit"
-              className="bg-violet-500 rounded-md px-5 h-12 font-semibold flex items-center gap-3 hover:bg-violet-600 transition-all"
+              className="bg-violet-500 rounded-md flex flex-col items-center justify-center px-5 h-12 font-semibold hover:bg-violet-600 transition-all w-48"
             >
-              <GameController size={24} />
-              Encontrar duo
+              {loading ?
+                <BounceLoader
+                  color="white"
+                  size={24} />
+                :
+                <div className="flex items-center gap-3">
+                  <GameController size={24} />
+                  Encontrar duo
+                </div>
+              }
             </button>
           </footer>
         </form>
